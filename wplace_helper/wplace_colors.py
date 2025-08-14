@@ -64,3 +64,7 @@ wplace_colors_map = {
     (109, 117, 141): "Slate",
     (179, 185, 209): "Light Slate",
 }
+
+wplace_colors_map_bgr = {
+    tuple(list(k)[::-1]): v for k, v in wplace_colors_map.items()
+}

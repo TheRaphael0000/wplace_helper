@@ -1,23 +1,16 @@
-import cv2
 import numpy as np
-import os
-import pathlib
-from .wplace_colors import wplace_colors_map
+from .wplace_colors import wplace_colors_map_bgr
 
 
-def img_to_unique_colors_imgs(path):
-    img = cv2.imread(path, cv2.IMREAD_UNCHANGED)
-
+def img_to_unique_colors_imgs(img):
     img_2d = img.reshape(img.shape[0] * img.shape[1], img.shape[2])
     unique_colors = np.unique(img_2d, axis=0)
 
     # ensure we dont have an non-palettised image
     assert len(unique_colors) <= 64
 
-    output_folder = pathlib.Path(path.split(".")[0])
-    os.makedirs(output_folder, exist_ok=True)
-
     for unique_color in unique_colors:
+        unique_color_plain = tuple(unique_color[:-1])
         if unique_color[-1] <= 0:
             continue
 
@@ -29,16 +22,11 @@ def img_to_unique_colors_imgs(path):
         img_single_color[mask] = img[mask]
 
         try:
-            # BGR to RGB
-            color_label = wplace_colors_map[(
-                unique_color[2], unique_color[1], unique_color[0])]
+            color_label = wplace_colors_map_bgr[unique_color_plain]
         except:
+            # should not happen in the standard pipeline
             print(unique_color, "is not a WPlace color!")
-            unique_color_str = unique_color.astype(str)
-            # BGR to RGB
-            color_label = f"{unique_color_str[2]}_{unique_color_str[1]}_{unique_color_str[0]}"
+            unique_color_plain_str = map(str, unique_color_plain)
+            color_label = f"{'_'.join(unique_color_plain_str)}"
 
-        output_path = output_folder / \
-            f'{color_label.replace(" ", "_")}-{nb_pixels}pixels.png'
-
-        cv2.imwrite(str(output_path), img_single_color)
+        yield (img_single_color, nb_pixels, color_label)
