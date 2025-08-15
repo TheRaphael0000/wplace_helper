@@ -7,7 +7,7 @@ name = "wplace_helper"
 version = "0.1.0"
 authors = [{ name = "TheRaphael0000", email = "you@example.com" }]
 description = "A minimal CLI project."
-dependencies = ["opencv-python", "numpy", "PySide6"]
+dependencies = ["opencv-python", "numpy", "scikit-image", "PySide6"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["wplace_helper"]

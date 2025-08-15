@@ -2,7 +2,12 @@ from PySide6.QtWidgets import QMainWindow, QWidget, QLabel, QPushButton, QFileDi
 from PySide6.QtGui import QPixmap
 from PySide6.QtCore import Qt
 
-from wplace_helper.lib import color_reduction, ensure_alpha_channel, img_to_unique_colors_imgs
+from wplace_helper.lib import (
+    color_reduction,
+    ensure_alpha_channel,
+    wplace_colors_map_rgb,
+    color_split,
+)
 from .utils import convert_cv_to_qpixmap
 import cv2
 
@@ -78,11 +83,12 @@ class MainWindow(QMainWindow):
         self.set_cv_img_to_label(self.cv_original_img, self.lbl_img_1)
 
         print("color reduc")
-        self.cv_palettise_img = color_reduction(self.cv_original_img)
+        self.cv_palettise_img = color_reduction(
+            self.cv_original_img, wplace_colors_map_rgb)
         self.set_cv_img_to_label(self.cv_palettise_img, self.lbl_img_2)
 
-        print("img to unique")
-        for (img_single_color, nb_pixels, color_label) in img_to_unique_colors_imgs(self.cv_palettise_img):
+        print("img to")
+        for (img_single_color, nb_pixels, color_label) in color_split(self.cv_palettise_img):
             self.cv_single_color_imgs.append(img_single_color)
         print("done")
 

@@ -24,6 +24,8 @@ Will clone the repository and install the python module as a dev to your current
 ```bash
 git clone https://github.com/TheRaphael0000/wplace_helper
 cd wplace_helper
+python -m venv venv
+source venv/Script/activate # windows: venv\Script\activate.bat
 python -m pip install -e .
 ```
 

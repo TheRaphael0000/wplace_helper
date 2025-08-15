@@ -1,10 +1,11 @@
 import cv2
 import argparse
 from wplace_helper.lib import (
-    img_to_unique_colors_imgs,
     color_reduction,
     img_info,
-    ensure_alpha_channel
+    color_split,
+    ensure_alpha_channel,
+    wplace_colors_map_rgb,
 )
 import pathlib
 import os
@@ -38,11 +39,10 @@ def main():
     nb_digits = len(str(nb_non_transparent))
 
     if not args.no_reduction:
-        img = color_reduction(img)
-        cv2.imwrite(
-            str(output_folder / f"{nb_non_transparent}_pixels_palettise.png"), img)
+        img = color_reduction(img, wplace_colors_map_rgb)
+        filename = f"{nb_non_transparent}_pixels_palettised.png"
+        cv2.imwrite(str(output_folder / filename), img)
 
-    for (img_single_color, nb_pixels, color_label) in img_to_unique_colors_imgs(img):
-        filename = f'{str(nb_pixels).zfill(nb_digits)}_pixels-{color_label.replace(" ", "_")}.png'
-        output_path = output_folder / filename
-        cv2.imwrite(str(output_path), img_single_color)
+    for (img_single_color, nb_pixels, color_label) in color_split(img):
+        filename = f'{str(nb_pixels).zfill(nb_digits)}_pixels_{color_label.replace(" ", "_")}.png'
+        cv2.imwrite(str(output_folder / filename), img_single_color)

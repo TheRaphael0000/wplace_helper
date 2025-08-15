@@ -2,7 +2,7 @@ import numpy as np
 from .wplace_colors import wplace_colors_map_bgr
 
 
-def img_to_unique_colors_imgs(img):
+def color_split(img):
     img_surface = img.shape[0] * img.shape[1]
     img_2d = img.reshape(img_surface, img.shape[2])
     unique_colors = np.unique(img_2d, axis=0)

@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
 
+
 def img_info(img):
     alpha_channel = img[:, :, 3]
     non_transparent_mask = alpha_channel > 0
@@ -17,3 +18,11 @@ def ensure_alpha_channel(image: np.ndarray) -> np.ndarray:
         return cv2.cvtColor(image, cv2.COLOR_GRAY2BGRA)
     else:
         raise ValueError("Unsupported number of channels in the image.")
+
+
+def split_alpha(img):
+    return img[:, :, :3], img[:, :, 3]
+
+
+def merge_alpha(img_colors, img_alpha):
+    return np.dstack((img_colors, img_alpha))
