@@ -6,9 +6,6 @@ def img_to_unique_colors_imgs(img):
     img_2d = img.reshape(img.shape[0] * img.shape[1], img.shape[2])
     unique_colors = np.unique(img_2d, axis=0)
 
-    # ensure we dont have an non-palettised image
-    assert len(unique_colors) <= 64
-
     for unique_color in unique_colors:
         unique_color_plain = tuple(unique_color[:-1])
         if unique_color[-1] <= 0:

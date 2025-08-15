@@ -12,11 +12,13 @@ def main():
         description='Split image by color',
         epilog='github.com/TheRaphael0000/wplace_helper'
     )
-    parser.add_argument("filename")
+    parser.add_argument("filename", )
     parser.add_argument(
         "--no-reduction",
         action='store_true',
-        help="Doesn't perform color reduction"
+        help="Doesn't perform color reduction (a.k.a. Palettise)."
+        "If you didn't palettise your image first you'll end up with a lot of images."
+        "Only use it if you know what you are doing."
     )
 
     args = parser.parse_args()
@@ -34,7 +36,7 @@ def main():
         cv2.imwrite(str(output_folder / "_color_reduced.png"), img)
 
     for (img_single_color, nb_pixels, color_label) in img_to_unique_colors_imgs(img):
-        filename = f'{color_label.replace(" ", "_")}-{nb_pixels}pixels.png'
+        filename = f'{nb_pixels}_pixels-{color_label.replace(" ", "_")}.png'
         output_path = output_folder / filename
         cv2.imwrite(str(output_path), img_single_color)
 
