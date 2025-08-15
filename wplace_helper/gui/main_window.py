@@ -2,7 +2,7 @@ from PySide6.QtWidgets import QMainWindow, QWidget, QLabel, QPushButton, QFileDi
 from PySide6.QtGui import QPixmap
 from PySide6.QtCore import Qt
 
-from wplace_helper.lib import color_reduction, ensure_alpha_channel
+from wplace_helper.lib import color_reduction, ensure_alpha_channel, img_to_unique_colors_imgs
 from .utils import convert_cv_to_qpixmap
 import cv2
 
@@ -13,12 +13,14 @@ class MainWindow(QMainWindow):
 
         self.setWindowTitle("Wplace Helper")
 
+        self.setMinimumSize(600, 400)
+
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
 
         self.layout_main = QGridLayout(self.central_widget)
 
-        self.btn_browse = QPushButton("Browse image")
+        self.btn_open = QPushButton("Open image")
         self.btn_save = QPushButton("Save")
 
         self.lbl_img_1 = QLabel()
@@ -35,24 +37,34 @@ class MainWindow(QMainWindow):
         self.sa_2.setWidgetResizable(True)
         self.sa_2.setWidget(self.lbl_img_2)
 
-        self.layout_main.addWidget(self.btn_browse, 0, 0, 1, 2)
+        self.layout_main.addWidget(QLabel("Original Image"), 0, 0)
+        self.layout_main.addWidget(self.btn_open, 0, 1)
+        self.layout_main.addWidget(QLabel("Palettise Image"), 0, 2)
+        self.layout_main.addWidget(self.btn_save, 0, 3)
 
-        self.layout_main.addWidget(QLabel("Original Image"), 1, 0)
-        self.layout_main.addWidget(self.sa_1, 2, 0)
+        self.layout_main.addWidget(self.sa_1, 1, 0, 1, 2)
+        self.layout_main.addWidget(self.sa_2, 1, 2, 1, 2)
 
-        self.layout_main.addWidget(QLabel("Palettise Image"), 1, 1)
-        self.layout_main.addWidget(self.sa_2, 2, 1)
+        self.btn_open.clicked.connect(self.on_btn_open_click)
+        self.btn_save.clicked.connect(self.on_btn_save_click)
 
-        self.layout_main.addWidget(self.btn_save, 3, 0, 1, 2)
+        self.cv_original_img = None
+        self.cv_palettise_img = None
+        self.cv_single_color_imgs = []
 
-        self.btn_browse.clicked.connect(self.on_button_click)
+    def on_btn_save_click(self):
+        file_dialog = QFileDialog()
+        dir_path = file_dialog.getExistingDirectory(
+            self,
+            "Select save directory"
+        )
+        print(dir_path)
 
-    def on_button_click(self):
-
+    def on_btn_open_click(self):
         file_dialog = QFileDialog()
         file_path, _ = file_dialog.getOpenFileName(
             self,
-            "Select Image File",
+            "Select image file",
             "",
             "Image Files (*.png *.jpg *.jpeg *.bmp)"
         )
@@ -60,26 +72,26 @@ class MainWindow(QMainWindow):
         if not file_path:
             return
 
-        pixmap = QPixmap(file_path)
+        self.cv_original_img = cv2.imread(file_path, cv2.IMREAD_UNCHANGED)
+        self.cv_original_img = ensure_alpha_channel(self.cv_original_img)
 
+        self.set_cv_img_to_label(self.cv_original_img, self.lbl_img_1)
+
+        print("color reduc")
+        self.cv_palettise_img = color_reduction(self.cv_original_img)
+        self.set_cv_img_to_label(self.cv_palettise_img, self.lbl_img_2)
+
+        print("img to unique")
+        for (img_single_color, nb_pixels, color_label) in img_to_unique_colors_imgs(self.cv_palettise_img):
+            self.cv_single_color_imgs.append(img_single_color)
+        print("done")
+
+    def set_cv_img_to_label(self, cv_img, lbl: QLabel):
+        print("set image 2 label")
+        pixmap = convert_cv_to_qpixmap(cv_img)
         if pixmap.isNull():
-            self.lbl_img_1.setText(
+            lbl.setText(
                 "Could not load image. Please select a valid image file."
             )
             return
-
-        self.lbl_img_1.setPixmap(pixmap)
-
-        cv_img = cv2.imread(file_path, cv2.IMREAD_UNCHANGED)
-        cv_img = ensure_alpha_channel(cv_img)
-        cv_img = color_reduction(cv_img)
-
-        pixmap2 = convert_cv_to_qpixmap(cv_img)
-
-        if pixmap2.isNull():
-            self.lbl_img_2.setText(
-                "Could not load image. Please select a valid image file."
-            )
-            return
-
-        self.lbl_img_2.setPixmap(pixmap2)
+        lbl.setPixmap(pixmap)

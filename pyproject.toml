@@ -14,3 +14,5 @@ packages = ["wplace_helper"]
 
 [project.scripts]
 wplace_helper = "wplace_helper.__main__:main"
+wplace_helper_cli = "wplace_helper.cli.__main__:main"
+wplace_helper_gui = "wplace_helper.gui.__main__:main"

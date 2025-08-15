@@ -19,7 +19,7 @@ Convert a multicolor image to multiple unique color images
 
 # Install for devs
 
-Will clone the repository and install the python module as a dev to your current python env
+Will clone the repository and install the python module as a dev to your current python env.
 
 ```bash
 git clone https://github.com/TheRaphael0000/wplace_helper
@@ -34,13 +34,14 @@ Not needed if you just installed the script.
 ```bash
 cd wplace_helper
 git pull
+python -m pip install -e .
 ```
 
 # Usage
 
 ## Standard usage
 
-Will palettise you image to Wplace's 63 colors and create an image file for each color on input image.
+Will palettise your image to Wplace's 63 colors and create an image file for each color on input image.
 
 ```bash
 python -m wplace_helper "mypixelart.png"
@@ -56,6 +57,12 @@ python -m wplace_helper --help
 # if you didn't palettise your image first you'll end up with a lot of images
 # only use it if you know what you are doing
 python -m wplace_helper "mypixelart.png" --no-reduction 
+```
+
+## GUI
+
+```bash
+python -m wplace_helper.gui # wip
 ```
 
 # Todo
